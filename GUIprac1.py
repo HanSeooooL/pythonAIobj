@@ -64,7 +64,7 @@ print(listbox.size())
 #checkBox
 def flash():
     checkbutton1.flash()
-    checkVariety_2.set('')
+    checkVariety_2.set(1)
     checkbutton1.config(text=checkVariety_2.get())
 
 def deselect():
@@ -75,16 +75,16 @@ def deselect():
 #checkVariety -> 체크됐는지 안됐는지 체크하는 변수
 #IntVar -> 2개의 값(1, 0)만 존재. True(1) or False(0)
 checkVariety_1=tk.IntVar()
-checkVariety_2=tk.StringVar()
+checkVariety_2=tk.IntVar()
 checkVariety_3=tk.IntVar()
 
 #버튼 생성
 checkbutton1=tk.Checkbutton(window, text='O',variable=checkVariety_1,activebackground='blue')
 checkbutton2=tk.Checkbutton(window, text='?', variable=checkVariety_2, command=deselect)
 checkbutton3=tk.Checkbutton(window, text='X', variable=checkVariety_3, command=flash)
-checkbutton1.pack()
-checkbutton2.pack()
-checkbutton3.pack()
-
+checkbutton1.pack(side='left', padx=10)
+checkbutton2.pack(side='left')
+checkbutton3.pack(side='left')
 window.mainloop()
+
 
