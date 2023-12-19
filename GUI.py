@@ -29,5 +29,62 @@ button=tk.Button(window, overrelief='solid', width=15, command=countUP, repeatde
                  repeatinterval=100)
 button.pack()
 
+#Entry
+#실행함수 -> Event Handler
+def calc(event):
+    #entry.get() -> 입력한 문자열을 읽어오는 것
+    label.config(text='결과='+str(eval(entry.get())))
+    
+def printtexts(event):
+    label.config(text='입력값='+str(entry.get()))
+
+#생성
+entry=tk.Entry(window)
+#entry.bind(키설정, 실행함수) -> Event Listener
+entry.bind("<Return>", calc)
+entry.pack()
+label=tk.Label(window)
+label.pack()
+
+#Listbox
+listbox = tk.Listbox(window, selectmode='extended', height=0)
+listbox.insert(0, "1번")
+listbox.insert(1, "2번")
+listbox.insert(2, "2번")
+listbox.insert(3, "2번")
+listbox.insert(4, "3번")
+listbox.pack()
+
+#Element Delete
+listbox.delete(1, 2)
+
+#listboxSize 반환함수
+print(listbox.size())
+    
+#checkBox
+def flash():
+    checkbutton1.flash()
+    checkVariety_2.set('')
+    checkbutton1.config(text=checkVariety_2.get())
+
+def deselect():
+    checkbutton1.deselect()
+    checkbutton2.deselect()
+    checkbutton3.deselect()
+
+#checkVariety -> 체크됐는지 안됐는지 체크하는 변수
+#IntVar -> 2개의 값(1, 0)만 존재. True(1) or False(0)
+checkVariety_1=tk.IntVar()
+checkVariety_2=tk.StringVar()
+checkVariety_3=tk.IntVar()
+
+#버튼 생성
+checkbutton1=tk.Checkbutton(window, text='O',variable=checkVariety_1,activebackground='blue')
+checkbutton2=tk.Checkbutton(window, text='?', variable=checkVariety_2, command=deselect)
+checkbutton3=tk.Checkbutton(window, text='X', variable=checkVariety_3, command=flash)
+checkbutton1.pack()
+checkbutton2.pack()
+checkbutton3.pack()
+
 window.mainloop()
 

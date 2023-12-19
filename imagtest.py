@@ -11,4 +11,5 @@ print(info)
 
 info['meta']='example meta data'
 new_image_path='new_image.jpg'
+#이미지 복사
 image.save(new_image_path, format='JPEG', **info)
