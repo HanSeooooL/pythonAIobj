@@ -14,9 +14,6 @@ class Calculator:
         self.result.pack(pady=10)
         
         #숫자버튼
-        
-        
-        
         bu1 = tk.Button(self.master, text="1", command=lambda: self.addNumber(number=1))
         bu2 = tk.Button(self.master, text="2", command=lambda: self.addNumber(number=2))
         bu3 = tk.Button(self.master, text="3", command=lambda: self.addNumber(number=3))
