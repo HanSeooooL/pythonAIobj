@@ -1,46 +1,88 @@
-import socket
-from threading import Thread
-import tkinter
-import base64
-tk = tkinter.Tk()
-tk.geometry("1000x1000")
-entry = tkinter.Entry(tk)
-entry2 = tkinter.Listbox(tk, height=15, width=50)
-HOST = "192.168.214.51"  #IP주소
-PORT = 9900
+import socketserver
+import threading
+HOST = 'localhost'   # 서버가 구동될 IP
+PORT = 4400 # 포트번호
+lock = threading.Lock()
 
-def rcvMsg(sock):
-    while True:
+class UserManager:
+    def __init__(self) -> None:
+        self.users = {} 
+    
+    def addUser(self, username, conn, addr):
+        if username in self.users:
+            conn.send("이미 등록된 사용자입니다. \n".encode())
+            return None
+    
+        lock.acquire()
+        self.users[username] = (conn, addr)
+        lock.release()
+        self.sendMessagetoAll('[%s]님이 입장했습니다' % username)
+        return username
+    
+    def removeUser(self, username):
+        if username not in self.users:
+            return
+        lock.acquire()
+        del self.users[username]
+        lock.release()
+        self.sendMessagetoAll('[%s]님이 퇴장했습니다' % username)
+        print('대화 참여자 수 [%d]' % len(self.users))
+        
+    def messageHandler(self, username, msg):
+        if msg[0] != '/':
+            self.sendMessagetoAll('[%s] %s' %(username, msg))
+            return
+        
+        if msg.strip() == '/quit':
+            self.removeUser(username)
+            return -1
+    
+    def sendMessagetoAll(self, msg):
+        for conn, addr in self.users.values():
+            conn.send(msg.encode())
+
+class MyTcpHandler(socketserver.BaseRequestHandler):
+    userman = UserManager()
+    def handle(self):
+        print(self, "self memory")
+        print('client [%s] 연결' % self.client_address[0])
         try:
-            data = sock.recv(1024)
-            if not data:
-                break
-            print(data.decode())
-            entry2.insert(-1, data.decode() + "\n")
-            entry2.update()
-            entry2.see(0)
-        except:
-            pass
+            username = self.registerUsername()
+            print(username, " username")
+            msg = self.request.recv(1024)
+            print(self.request)
+            print(self.client_address)
+            print(self.server)
+            while msg:
+                print(msg.decode())
+                if self.userman.messageHandler(username, msg.decode()) == -1:
+                    self.request.close()
+                    break
+                msg = self.request.recv(1024)
+        except Exception as e:
+            print(e)
+        print('[%s] 접속 종료' % self.client_address[0])
+        self.userman.removeUser(username)
+        
+    def registerUsername(self):
+        while True:
+            self.request.send('ID'.encode())
+            username = self.request.recv(1024)
+            username = username.decode().strip()
+            if self.userman.addUser(username, self.request, self.client_address):
+                return username
 
-def runChat():
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
-        sock.connect((HOST, PORT))
-        t = Thread(target=rcvMsg, args=(sock,))
-        t.daemon = True
-        t.start()
-        def okClick():
-            sock.send(entry.get().encode())
-        def onEnter(event):
-            okClick()
-            entry.delete(0, tkinter.END)
-        entry2.pack(side=tkinter.LEFT, fill=tkinter.BOTH, padx=5, pady=5)
-        label = tkinter.Label(tk, text='채팅.')
-        entry.pack()
-        label.pack()
-        btn = tkinter.Button(tk, text='OK', command=okClick)
-        btn.pack()
-        entry.bind("<Return>", onEnter)
-        tk.mainloop()
+class ChatingServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
+    pass
 
-runChat()
-            
+def runServer():
+    try:
+        server = ChatingServer((HOST, PORT), MyTcpHandler)
+        server.serve_forever()
+    except KeyboardInterrupt:
+        print('채팅 서버를 종료합니다.')
+        server.shutdown()
+        server.server_close()
+        
+runServer()
+        
