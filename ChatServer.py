@@ -72,6 +72,7 @@ class MyTcpHandler(socketserver.BaseRequestHandler):
             if self.userman.addUser(username, self.request, self.client_address):
                 return username
 
+# ThreadingMixIn과 TCPServer를 상속받은 클래스 선언
 class ChatingServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
     pass
 
