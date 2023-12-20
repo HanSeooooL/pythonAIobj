@@ -1,6 +1,7 @@
 import socket
 from threading import Thread
 import tkinter
+import base64
 tk = tkinter.Tk()
 tk.geometry("1000x1000")
 entry = tkinter.Entry(tk)
@@ -26,6 +27,7 @@ def runChat():
         sock.connect((HOST, PORT))
         t = Thread(target=rcvMsg, args=(sock,))
         t.daemon = True
+        t.start()
         def okClick():
             sock.send(entry.get().encode())
         def onEnter(event):
