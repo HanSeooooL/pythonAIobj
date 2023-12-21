@@ -1,8 +1,24 @@
 import socketserver
 import threading
 HOST = 'localhost'   # 서버가 구동될 IP
-PORT = 4400 # 포트번호
+PORT = 4401 # 포트번호
 lock = threading.Lock()
+
+# 관리자 클래스
+class administrator:
+    def messageHandler(self, username, msg):
+        if msg[0] != '/':
+            self.sendMessagetoAll('[%s] %s' %(username, msg))
+            return
+        
+        if (username == admin) and msg.find('/공지') != -1:
+            msg = msg.strip('/공지 ')
+            self.sendMessagetoAll('[공지] %s' %(msg))
+            return
+        
+        if msg.strip() == '/quit':
+            self.removeUser(username)
+            return -1
 
 class UserManager:
     def __init__(self) -> None:
@@ -31,6 +47,11 @@ class UserManager:
     def messageHandler(self, username, msg):
         if msg[0] != '/':
             self.sendMessagetoAll('[%s] %s' %(username, msg))
+            return
+        
+        if msg.find('/공지') != -1:
+            msg = msg.strip('/공지 ')
+            self.sendMessagetoAll('[공지] %s' %(msg))
             return
         
         if msg.strip() == '/quit':
@@ -86,4 +107,8 @@ def runServer():
         server.server_close()
         
 runServer()
-        
+
+#ID admin이라고 입력하면 관리자 권한을 부여
+#관리자는 전체공지 기능이 있다.add()
+#전체공지는 "/공지 할말" 형태로 작성
+#공지는 다른 유저가 봤을 때 [공지]~~~~~ 형태로 출력

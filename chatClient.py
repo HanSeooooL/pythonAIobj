@@ -10,7 +10,7 @@ tk.geometry("1000x1000")
 entry = tkinter.Entry(tk)
 entry2 = tkinter.Listbox(tk, height=15, width=50)
 HOST = "localhost"  #IP주소
-PORT = 4400
+PORT = 4401
 
 def rcvMsg(sock):
     while True:
